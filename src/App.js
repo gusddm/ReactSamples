@@ -1,21 +1,49 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+//import './App.css';
+import NotebookForm from './components/NotebookForm';
+import NoteList from './components/NoteList';
+import { base } from './base';
+import { createStore } from 'redux';
+ 
+export default class App extends Component {
+  constructor() {
+    super();
+    this.state =  { 
+      notes : {}
+    }
+    this.addNote = this.addNote.bind(this);    
+  }
 
-class   App extends Component {
+  componentWillMount() {
+    this.ref = base.syncState(`notes`
+      , {
+      context: this,
+      state: 'notes'
+      });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
+
+  addNote(note) {
+    const notes = {...this.state.notes};
+    const timeStamp = Date.now();
+    notes[`note-`+timeStamp] = note;
+    this.setState( { notes } );
+  }
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h3 className="App-title">Welcome to Notebook</h3>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+        <div className="noteForm">
+          <div className='notes'><NoteList notes={this.state.notes} /></div>
+          <div className='addNote'><NotebookForm  addNote={this.addNote} /></div> 
+        </div>
+      </div>      
     );
   }
 }
-
-export default App;
